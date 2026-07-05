@@ -25,6 +25,7 @@ export async function GET() {
     return new Response(JSON.stringify(materiasFormatadas), {
       status: 200,
       headers: {
+        "Access-Control-Allow-Origin": "https://imperatransito.com.br"
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*" 
       }
