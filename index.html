@@ -35,78 +35,9 @@
         <div class="container">
             <h2 class="section-title">Conteúdo Exclusivo</h2>
             
-            <div class="cards-grid">
-                <a href="card-01.html" class="card">
-                    <div class="card-image">
-                        <img src="./img/prova-pratica.jpeg" alt="Matéria">
-                        <span class="badge">Matéria</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>NOVA PONTUAÇÃO NA PRÓVA PRÁTICA</h3>
-                        <p>Fique por dentro do que mudou e se surpreenda com as novas atualizações.</p>
-                        <span class="btn-card">Ler Matéria</span>
-                    </div>
-                </a>
-
-                <a href="card-02.html" class="card">
-                    <div class="card-image">
-                        <img src="./img/aplicativo-cnh-do-brasil.jpg" alt="Simulado">
-                        <span class="badge yellow">Matéria</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>RENOVAÇÃO AUTOMÁTICA DA CNH</h3>
-                        <p>Clique aqui e descubra que é possível a renovação automática da CNH e de graça.</p>
-                        <span class="btn-card">Ler matéria</span>
-                    </div>
-                </a>
-
-                <a href="https://youtu.be/SURFhYng3pY?si=BgOgtuM7DpXcR-Nc" class="card">
-                    <div class="card-image">
-                        <img src="./img/carro-casal-idosos.jpg" alt="Vídeo Aula">
-                        <span class="badge red">Vídeo Aula</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>QUAL A IDADE MÁXIMA PARA DIRIGIR NO BRASIL?</h3>
-                        <p>Assista nossa aula completa e saiba até quando você pode dirigir.</p>
-                        <span class="btn-card">Assistir Agora</span>
-                    </div>
-                </a>
-
-                <a href="/card-03.html" class="card">
-                    <div class="card-image">
-                        <img src="./img/scooter-eletrico-yamaha.jpg" alt="Sinalização">
-                        <span class="badge">Matéria</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>CINQUENTINHAS ELÉTRICAS, PRECISA EMPLACAR E TER CNH?</h3>
-                        <p>Nessa matéria você entede tudo sobre essa nova tendência do mercado. Clica e descubra.</p>
-                        <span class="btn-card">Explorar Guia</span>
-                    </div>
-                </a>
-
-                <a href="/card-04.html" class="card">
-                    <div class="card-image">
-                        <img src="/img/exame-toxicologico.jpg" alt="Mecânica">
-                        <span class="badge yellow">MATÉRIA</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>EXAME TOXICOLÓGICO PARA PRIMEIRA HABILITAÇÃO</h3>
-                        <p>Agora é obrigatório para categoria A e B a partir de 1 de junho de 2026</p>
-                        <span class="btn-card">LER MATÉRIA</span>
-                    </div>
-                </a>
-
-                <a href="https://youtu.be/0laxxc1stNw?si=g9ua_YDa8j-eVo8k" class="card">
-                    <div class="card-image">
-                        <img src="/img/distancia-segura.jpe" alt="Primeiros Socorros">
-                        <span class="badge red">VÍDEO AULA</span>
-                    </div>
-                    <div class="card-info">
-                        <h3>DIREÇÃO DEFENSIVA</h3>
-                        <p>Manter uma distância segura no trânsito faz toda a diferença para um trânsito mais humano e seguro</p>
-                        <span class="btn-card">Assistir Aula</span>
-                    </div>
-                </a>
+            <!-- Os cards estáticos sumiram! O JavaScript vai injetar os posts do blog aqui dentro -->
+            <div id="blog-cards-container" class="cards-grid">
+                <p style="text-align: center; grid-column: 1/-1; color: #666;">Carregando matérias recentes...</p>
             </div>
         </div>
     </section>
@@ -125,5 +56,54 @@
         </div>
     </footer>
 
+    <!-- SCRIPT DE INTEGRAÇÃO DINÂMICA -->
+    <script>
+        // Ajuste esta URL com o endereço real onde os dados do seu blog estão expostos
+        const API_URL = 'https://blog.imperatransito.com.br/materias.json'; 
+
+        async function carregarMaterias() {
+            const container = document.getElementById('blog-cards-container');
+            
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Erro ao buscar posts');
+                
+                const materias = await response.json();
+                
+                // Limpa a mensagem de "Carregando..."
+                container.innerHTML = '';
+                
+                // Renderiza cada matéria vinda do Blog usando exatamente o seu layout CSS
+                materias.forEach(post => {
+                    // Define a classe do badge dinamicamente dependendo do tipo de conteúdo
+                    let badgeClass = 'badge';
+                    if (post.tipo.toLowerCase() === 'vídeo aula') badgeClass = 'badge red';
+                    if (post.tipo.toLowerCase() === 'simulado' || post.badge_amarelo) badgeClass = 'badge yellow';
+
+                    const cardHTML = `
+                        <a href="${post.link}" class="card" target="_blank">
+                            <div class="card-image">
+                                <img src="${post.imagem}" alt="${post.titulo}">
+                                <span class="${badgeClass}">${post.tipo}</span>
+                            </div>
+                            <div class="card-info">
+                                <h3>${post.titulo.toUpperCase()}</h3>
+                                <p>${post.resumo}</p>
+                                <span class="btn-card">${post.texto_botao || 'Ler Matéria'}</span>
+                            </div>
+                        </a>
+                    `;
+                    container.innerHTML += cardHTML;
+                });
+
+            } catch (error) {
+                console.error('Erro na integração do blog:', error);
+                container.innerHTML = `<p style="text-align: center; grid-column: 1/-1; color: #cc0000;">Não foi possível carregar as matérias recentes no momento.</p>`;
+            }
+        }
+
+        // Executa a função ao carregar a página
+        document.addEventListener('DOMContentLoaded', carregarMaterias);
+    </script>
 </body>
 </html>
