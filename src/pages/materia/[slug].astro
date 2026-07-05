@@ -1,0 +1,185 @@
+---
+import { client } from '../../lib/sanity';
+import { toHTML } from '@portabletext/to-html';
+
+// 1. Dizemos ao Astro quais caminhos (slugs) existem no Sanity para gerar as páginas
+export async function getStaticPaths() {
+  const posts = await client.fetch(`*[_type == "post"]{ "slug": slug.current }`);
+  
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+// 2. Pegamos o slug da URL atual
+const { slug } = Astro.params;
+
+// 3. Buscamos os dados completos dessa matéria específica
+const query = `*[_type == "post" && slug.current == $slug][0]{
+  title,
+  publishedAt,
+  body,
+  "imageUrl": mainImage.asset->url
+}`;
+
+const materia = await client.fetch(query, { slug });
+
+// 4. Convertemos o bloco de texto formatado do Sanity para HTML puro
+const conteudoHtml = materia.body ? toHTML(materia.body) : '';
+---
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{materia.title} | Imperatrânsito</title>
+    <style>
+    :root {
+        --cor-principal: #1e293b;
+        --cor-destaque: #f59e0b;
+        --cor-fundo: #f8fafc;
+        --cor-texto: #334155;
+    }
+
+    body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: var(--cor-fundo);
+        color: var(--cor-texto);
+        margin: 0;
+        padding: 0;
+        line-height: 1.8;
+    }
+
+    /* Barra Superior de Navegação */
+    header {
+        background-color: #0f172a;
+        padding: 1.2rem 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .btn-voltar {
+        color: #94a3b8;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-voltar:hover {
+        color: var(--cor-destaque);
+    }
+
+    /* Container do Artigo */
+    main {
+        max-width: 820px;
+        margin: 4rem auto;
+        padding: 0 1.5rem;
+    }
+
+    article {
+        background: white;
+        padding: 3.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .data {
+        color: #64748b;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    h1 {
+        color: var(--cor-principal);
+        font-size: 2.8rem;
+        font-weight: 800;
+        line-height: 1.25;
+        margin: 0.75rem 0 2rem 0;
+        letter-spacing: -0.5px;
+    }
+
+    /* Imagem de Capa Responsiva */
+    .capa {
+        width: 100%;
+        max-height: 450px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    /* Formatação do Texto da Matéria (PortableText) */
+    .conteudo {
+        font-size: 1.2rem;
+        color: #1e293b;
+    }
+
+    .conteudo p {
+        margin-bottom: 1.75rem;
+    }
+
+    /* Estilo para subtítulos dentro do texto */
+    .conteudo h2 {
+        color: var(--cor-principal);
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .conteudo h3 {
+        color: var(--cor-principal);
+        font-size: 1.4rem;
+        margin-top: 2rem;
+    }
+
+    /* Estilo para listas dentro da matéria */
+    .conteudo ul, .conteudo ol {
+        margin-bottom: 1.75rem;
+        padding-left: 1.5rem;
+    }
+
+    .conteudo li {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Responsividade para celulares */
+    @media (max-width: 640px) {
+        article {
+            padding: 2rem 1.25rem;
+        }
+        h1 {
+            font-size: 2rem;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <header>
+        <a href="/" class="btn-voltar">← Voltar para a Página Inicial</a>
+    </header>
+
+    <main>
+        <article>
+            <span class="data">
+                Publicado em: {new Date(materia.publishedAt).toLocaleDateString('pt-BR')}
+            </span>
+            <h1>{materia.title}</h1>
+
+            {materia.imageUrl && (
+                <img src={materia.imageUrl} alt={materia.title} class="capa" />
+            )}
+
+            <div class="conteudo" set:html={conteudoHtml} />
+        </article>
+    </main>
+
+</body>
+</html>

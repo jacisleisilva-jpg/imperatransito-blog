@@ -1,0 +1,17 @@
+{
+  "name": "site-blog",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@portabletext/to-html": "^2.0.13",
+    "@sanity/client": "^6.28.2",
+    "astro": "^4.16.18"
+  }
+}
