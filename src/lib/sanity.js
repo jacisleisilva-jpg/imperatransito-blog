@@ -1,8 +1,8 @@
 import { createClient } from '@sanity/client'
 
 export const client = createClient({
-  projectId: 'gc58riml', // Troque pelo seu ID de 8 dígitos do Sanity
+  projectId: 'gc58riml',
   dataset: 'production',
-  useCdn: true,
-  apiVersion: '2026-06-21',
+  useCdn: false,
+  apiVersion: '2025-01-01',
 })
