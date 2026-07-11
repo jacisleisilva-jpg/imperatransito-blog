@@ -4,8 +4,12 @@ import { toHTML } from '@portabletext/to-html';
 
 // 1. Dizemos ao Astro quais caminhos (slugs) existem no Sanity para gerar as páginas
 export async function getStaticPaths() {
-  const posts = await client.fetch(`*[_type == "post"]{ "slug": slug.current }`);
-  
+  const posts = await client.fetch(`
+    *[_type == "post" && defined(slug.current)]{
+      "slug": slug.current
+    }
+  `);
+
   return posts.map((post) => ({
     params: { slug: post.slug },
   }));
