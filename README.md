@@ -7,3 +7,4 @@ Blog oficial do Impera Trânsito desenvolvido com:
 - Cloudflare Pages
 
 Autor: Jacislei Silva
+Teste deploy automatico Cloudflare
