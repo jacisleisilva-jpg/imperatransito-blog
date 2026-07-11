@@ -1,4 +1,3 @@
-```astro
 ---
 // 1. Importamos o cliente do Sanity que configuramos na pasta lib
 import { client } from '../lib/sanity';
@@ -166,9 +165,7 @@ const materias = await client.fetch(query);
 <section class="grid-materias">
 
 {materias.length > 0 ? (
-
     materias.map((materia) => (
-
         <article class="card-materia">
 
             {materia.imageUrl && (
@@ -186,27 +183,23 @@ const materias = await client.fetch(query);
                 </span>
 
                 <h2>
-                    <a href={`/materia/${materia.slug}`}>
+                    <a href={`/materia/${materia.slug || ''}`}>
                         {materia.title}
                     </a>
                 </h2>
 
-                <a href={`/materia/${materia.slug}`} class="ler-mais">
+                <a href={`/materia/${materia.slug || ''}`} class="ler-mais">
                     Ler matéria completa →
                 </a>
 
             </div>
 
         </article>
-
     ))
-
 ) : (
-
     <p class="sem-materias">
         Nenhuma matéria publicada ainda.
     </p>
-
 )}
 
 </section>
@@ -215,4 +208,3 @@ const materias = await client.fetch(query);
 
 </body>
 </html>
-```
